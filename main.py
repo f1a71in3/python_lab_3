@@ -27,14 +27,20 @@ def decode_from_blue_channel(img_path: str, keys_path: str) -> str:
                 line = line.strip()
                 if not line:
                     continue
-                match = re.search(r'\((\d+),\s*(\d+)\)', line)
-                if not match:
+                try:
+                    coord = eval(line)
+                    if isinstance(coord, tuple) and len(coord) == 2:
+                        x, y = coord
+                    else:
+                        raise ValueError("Не кортеж из двух элементов")
+                except Exception:
                     print(f"Предупреждение: строка {line_num} в '{keys_path}' не является парой координат: {line}")
                     continue
-                x, y = int(match.group(1)), int(match.group(2))
+
                 # Проверка, что координаты внутри изображения
                 if x >= width or y >= height:
-                    print(f"Предупреждение: координаты ({x},{y}) выходят за пределы изображения {width}x{height}, пропущены.")
+                    print(
+                        f"Предупреждение: координаты ({x},{y}) выходят за пределы изображения {width}x{height}, пропущены.")
                     continue
                 coords.append((x, y))
     except FileNotFoundError:
